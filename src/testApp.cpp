@@ -8,10 +8,13 @@ void testApp::setup(){
 	ofBackground(255,255,255);
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
+	//TODO: save artverts xml in the corresponding folder
 	vector<Artvert> artverts = Artvert::listAll("uploads");
 	for(int i=0; i<(int)artverts.size(); i++){
 		cout << "loading already uploaded " << artverts[i].getUID() << endl;
-		adverts.push(artverts[i]);
+		if(!Artvert(artverts[i].getUID(),"www/").isReady()){
+			adverts.push(artverts[i]);
+		}
 	}
 
 	server = ofxHTTPServer::getServer(); // get the instance of the server
@@ -20,6 +23,7 @@ void testApp::setup(){
 	server->setCallbackExtension("of");	 // extension of urls that aren't files but will generate a post or get event
 	ofAddListener(server->getEvent,this,&testApp::getRequest);
 	ofAddListener(server->postEvent,this,&testApp::postRequest);
+	ofAddListener(server->fileNotFoundEvent,this,&testApp::fileNotFound);
 	server->start(8888);
 
 
@@ -42,7 +46,7 @@ void testApp::getRequest(ofxHTTPServerResponse & response){
 void testApp::postRequest(ofxHTTPServerResponse & response){
 	ofLog(OF_LOG_VERBOSE,"new request: " + response.url);
 	if(response.url=="/postadvert.of"){
-		Artvert artvert(response.requestFields["uid"],"uploads");
+		Artvert artvert(response.requestFields["uid"],"uploads/");
 		mutex.lock();
 		adverts.push(artvert);
 		artvert.save();
@@ -57,7 +61,7 @@ void testApp::postRequest(ofxHTTPServerResponse & response){
 		ofLog(OF_LOG_VERBOSE,"ArtvertiserServer: checking analized: " + response.requestFields["uid"]);
 		Artvert artvert(response.requestFields["uid"],"www/");
 		ofLog(OF_LOG_VERBOSE,"ArtvertiserServer: detector data: " + artvert.getDetectorData().path());
-		if(artvert.getDetectorData().exists() && artvert.getTrackerData().exists()){
+		if(artvert.isReady()){
 			response.response = "<html> <head> oF http server </head> <body> image " + response.requestFields["uid"] + " already analyzed <body> </html>";
 		}else{
 			response.errCode = 404;
@@ -66,8 +70,9 @@ void testApp::postRequest(ofxHTTPServerResponse & response){
 		mutex.unlock();
 	}else if(response.url=="/checkuploaded.of"){
 		mutex.lock();
-		Artvert artvert(response.requestFields["uid"],"uploads");
-		if(artvert.getROIFile().exists() && artvert.getCompressedImage().exists()){
+		Artvert advert(response.requestFields["uid"],"uploads/");
+		Artvert artvert(response.requestFields["uid"],"www");
+		if((advert.getROIFile().exists() && advert.getCompressedImage().exists()) || (artvert.getROIFile().exists() && artvert.getCompressedImage().exists())){
 			response.response = "<html> <head> oF http server </head> <body> image " + response.requestFields["uid"] + " already uploaded <body> </html>";
 		}else{
 			response.errCode = 404;
@@ -77,11 +82,37 @@ void testApp::postRequest(ofxHTTPServerResponse & response){
 	}
 }
 
+void testApp::fileNotFound(ofxHTTPServerResponse & response){
+	ofLog(OF_LOG_VERBOSE,"file not found, redirecting?");
+	string uid = response.url.substr(1,response.url.find('.')-1);
+	Artvert artvert(uid,"www");
+	string file = response.url.substr(response.url.find('.'));
+	if(artvert.hasAlias()){
+		if(file == ".bmp.detector_data")
+			response.location = "/"+artvert.getAlias().getDetectorData().getFileName();
+		else if(file == ".bmp.tracker_data")
+			response.location = "/"+artvert.getAlias().getTrackerData().getFileName();
+		else if(file == ".bmp.roi")
+			response.location = "/"+artvert.getAlias().getROIFile().getFileName();
+		else if(file == ".bmp")
+			response.location = "/"+artvert.getAlias().getModel().getFileName();
+		else if(file == ".jpg")
+			response.location = "/"+artvert.getAlias().getCompressedImage().getFileName();
+		response.errCode = 301;
+	}
+}
+
 void testApp::analizeNext(){
 	mutex.lock();
 	if(!adverts.empty()){
 		currentAdvert = adverts.front();
 		adverts.pop();
+
+		if(currentAdvert.isReady()){
+			mutex.unlock();
+			return;
+		}
+
 		ofLog(OF_LOG_VERBOSE,"ArtvertiserServer: got new artvert: " + currentAdvert.getUID());
 		currentImg.loadImage(currentAdvert.getCompressedImage());
 
@@ -91,6 +122,25 @@ void testApp::analizeNext(){
 		bmp.saveImage(currentAdvert.getModel());
 
 		cout << "got " + currentAdvert.getUID() << endl;
+		vector<Artvert> artverts = Artvert::listAll("www");
+		for(int i=0;i<(int)artverts.size();i++){
+			if(currentAdvert.getUID() == artverts[i].getUID() || artverts[i].hasAlias() || !artverts[i].isReady()) continue;
+			ofImage img;
+			img.loadImage(artverts[i].getModel());
+			detector.setup(artverts[i].getModel().path(),img.getWidth(),img.getHeight(),artverts[i].getROI(),true);
+			detector.newFrame(bmp.getPixelsRef());
+			if(detector.isDetected() || detector.isTracked()){
+				redirections[currentAdvert] = artverts[i];
+				currentAdvert.setAliasUID(artverts[i].getUID());
+				currentAdvert.save();
+				PersistanceEngine::save();
+				detector.close();
+				cerr << "redirecting " << currentAdvert.getUID() << "->" << artverts[i].getUID() << endl;
+				mutex.unlock();
+				return;
+			}
+		}
+
 		detector.setupTrainOnly(currentAdvert.getModel().path());
 	}else{
 		if(detector.getState()!=Detector::Init) detector.close();
@@ -103,10 +153,13 @@ void testApp::update(){
 	if(detector.getState()==Detector::Init){
 		analizeNext();
 	}
-	if(detector.getState()==Detector::Finished){
+	if(detector.getState()==Detector::Finished && !currentAdvert.hasAlias()){
 		cerr << "finished analysis copying images to server folder" << endl;
-		currentAdvert.getDetectorData().copyTo("www/"+currentAdvert.getDetectorData().getFileName());
-		currentAdvert.getTrackerData().copyTo("www/"+currentAdvert.getTrackerData().getFileName());
+		currentAdvert.getModel().moveTo("www/"+currentAdvert.getModel().getFileName());
+		currentAdvert.getCompressedImage().copyTo("www/"+currentAdvert.getCompressedImage().getFileName());
+		currentAdvert.getROIFile().moveTo("www/"+currentAdvert.getROIFile().getFileName());
+		currentAdvert.getDetectorData().moveTo("www/"+currentAdvert.getDetectorData().getFileName());
+		currentAdvert.getTrackerData().moveTo("www/"+currentAdvert.getTrackerData().getFileName());
 
 		analizeNext();
 	}

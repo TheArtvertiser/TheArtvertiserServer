@@ -5,6 +5,7 @@
 
 #include <queue>
 #include <set>
+#include <map>
 
 #include "ofxHTTPServer.h"
 #include "ofxOpenCv.h"
@@ -28,6 +29,7 @@ class testApp : public ofBaseApp{
 
 		void getRequest(ofxHTTPServerResponse & response);
 		void postRequest(ofxHTTPServerResponse & response);
+		void fileNotFound(ofxHTTPServerResponse & response);
 
 		void analizeNext();
 
@@ -36,6 +38,7 @@ class testApp : public ofBaseApp{
         Detector detector;
 
         queue<Artvert> adverts;
+        map<Artvert,Artvert> redirections;
         ofMutex mutex;
 
         Artvert currentAdvert;
