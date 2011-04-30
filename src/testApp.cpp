@@ -40,6 +40,21 @@ void testApp::getRequest(ofxHTTPServerResponse & response){
 		window.onload=beginrefresh; \
 		</script>\
 				</head> <body> <img src=\"screen.jpg\"/> </body> </html>";
+	}else if(response.url=="/listcountries.of"){
+		vector<string> countries = locationDB.listCountries();
+		for(int i=0;i<(int)countries.size();i++){
+			response.response+=countries[i]+"\n";
+		}
+	}else if(response.url=="/listcities.of"){
+		vector<string> cities = locationDB.listCities(response.requestFields["country"]);
+		for(int i=0;i<(int)cities.size();i++){
+			response.response+=cities[i]+"\n";
+		}
+	}else if(response.url=="/listroads.of"){
+		vector<string> roads = locationDB.listRoads(response.requestFields["country"],response.requestFields["city"]);
+		for(int i=0;i<(int)roads.size();i++){
+			response.response+=roads[i]+"\n";
+		}
 	}
 }
 
@@ -51,11 +66,27 @@ void testApp::postRequest(ofxHTTPServerResponse & response){
 		adverts.push(artvert);
 		artvert.save();
 		PersistanceEngine::save();
+		locationDB.addLocation(artvert.getLocation());
 		mutex.unlock();
 
 		response.response = "<html> <head> oF http server </head> <body> image " + response.uploadedFiles["artvert"] + " received correctly <body> </html>";
 
 		//cout <<  "image " + response.uploadedFiles[0] + " received correctly" << endl;
+	}else if(response.url=="/listcountries.of"){
+		vector<string> countries = locationDB.listCountries();
+		for(int i=0;i<(int)countries.size();i++){
+			response.response+=countries[i]+"\n";
+		}
+	}else if(response.url=="/listcities.of"){
+		vector<string> cities = locationDB.listCities(response.requestFields["country"]);
+		for(int i=0;i<(int)cities.size();i++){
+			response.response+=cities[i]+"\n";
+		}
+	}else if(response.url=="/listroads.of"){
+		vector<string> roads = locationDB.listRoads(response.requestFields["country"],response.requestFields["city"]);
+		for(int i=0;i<(int)roads.size();i++){
+			response.response+=roads[i]+"\n";
+		}
 	}else if(response.url=="/checkanalized.of"){
 		mutex.lock();
 		ofLog(OF_LOG_VERBOSE,"ArtvertiserServer: checking analized: " + response.requestFields["uid"]);

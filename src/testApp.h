@@ -11,6 +11,7 @@
 #include "ofxOpenCv.h"
 #include "Detector.h"
 #include "Artvert.h"
+#include "LocationDB.h"
 
 class testApp : public ofBaseApp{
 
@@ -43,6 +44,8 @@ class testApp : public ofBaseApp{
 
         Artvert currentAdvert;
         ofImage currentImg;
+
+        LocationDB locationDB;
 };
 
 #endif
