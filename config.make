@@ -11,7 +11,7 @@ OF_ROOT = ../../..
 # USER_CFLAGS = -I src/objects
 
 USER_CFLAGS = -Isrc -Isrc/ofxHttpServer/src -Isrc/ofxHttpServer/libs/microhttpd/include 
-USER_CFLAGS += -I../artvertiserCommon -I../artvertiserCommon/ferns_demo-1.1 -I../artvertiserCommon/FAST -I../artvertiserCommon/persistance -I../artvertiserCommon/cv
+USER_CFLAGS += -I../artvertiserCommon/gui -I../artvertiserCommon -I../artvertiserCommon/ferns_demo-1.1 -I../artvertiserCommon/FAST -I../artvertiserCommon/persistance -I../artvertiserCommon/cv -I../artvertiserCommon/ofxGeoLocation -I../artvertiserCommon/ofxMD5 -I../artvertiserCommon/ofxMD5/libs/md5-1.3.0
 
 # USER_LDFLAGS allows to pass custom flags to the linker
 # for example libraries like:
