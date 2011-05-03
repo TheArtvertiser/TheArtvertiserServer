@@ -9,22 +9,24 @@
 #define LOCATIONDB_H_
 
 #include "ofxAndroidGPS.h"
-#include "Geo.h"
+#include "ofxGeoLocation.h"
 #include "ofConstants.h"
+#include "Artvert.h"
 
 class LocationDB {
 public:
 	LocationDB();
 	virtual ~LocationDB();
 
-	void addLocation(const ofxLocation & loc);
+	void addLocation(Artvert & artvert);
 	vector<string> listCountries();
 	vector<string> listCities(string country="");
 	vector<string> listRoads(string country="", string city="");
+	vector<string> listArtverts(string country="", string city="", string road="");
 
 private:
 	ofxXmlSettings xml;
-	Geo geo;
+	ofxGeoLocation geo;
 };
 
 #endif /* LOCATIONDB_H_ */

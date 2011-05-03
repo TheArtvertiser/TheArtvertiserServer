@@ -22,7 +22,8 @@ LocationDB::~LocationDB() {
 	xml.saveFile();
 }
 
-void LocationDB::addLocation(const ofxLocation & loc){
+void LocationDB::addLocation(Artvert & artvert){
+	ofxLocation loc = artvert.getLocation();
 	ofxXmlSettings address = geo.getAddressFor(loc);
 
 	string road = address.getValue("reversegeocode:addressparts:road","");
@@ -30,6 +31,7 @@ void LocationDB::addLocation(const ofxLocation & loc){
 	string country = address.getValue("reversegeocode:addressparts:country","");
 
 	int numLoc = xml.addTag("location");
+	xml.addAttribute("location","uid",artvert.getUID(),numLoc);
 	xml.addAttribute("location","lon",loc.longitude,numLoc);
 	xml.addAttribute("location","lat",loc.latitude,numLoc);
 
@@ -73,4 +75,18 @@ vector<string> LocationDB::listRoads(string country, string city){
 	vector<string> roads_vec;
 	roads_vec.assign(roads.begin(),roads.end());
 	return roads_vec;
+}
+
+vector<string> LocationDB::listArtverts(string country, string city, string road){
+	set<string> uids;
+	int numLocations = xml.getNumTags("location");
+	for(int i=0;i<numLocations;i++){
+		if((country=="" || xml.getAttribute("location","country","",i)==country)
+				&& (city=="" || xml.getAttribute("location","city","",i)==city)
+				&& (road=="" || xml.getAttribute("location","road","",i)==road))
+			uids.insert(xml.getAttribute("location","uid","",i));
+	}
+	vector<string> uids_vec;
+	uids_vec.assign(uids.begin(),uids.end());
+	return uids_vec;
 }
