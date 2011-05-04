@@ -91,6 +91,8 @@ void testApp::postRequest(ofxHTTPServerResponse & response){
 		Artvert artvert(response.requestFields["uid"],"uploads/");
 		if(!Artvert(artvert.getUID(),"www/").isReady()){
 			if(!artvert.checkIntegrity()){
+				ofLogVerbose("artvertiserServer") << "generated md5: " << artvert.generateMD5();
+				ofLogVerbose("artvertiserServer") << "received md5: " << artvert.getStoredMD5();
 				ofLogError("artvertiserServer",response.requestFields["uid"] + " was corrupt removing");
 				artvert.remove();
 				response.errCode = 500;
@@ -245,7 +247,13 @@ void testApp::update(){
 		locationDB.addLocation(currentAdvert);
 		if(!currentAdvert.hasAlias()){
 			ofLogError("artvertiserServer") << "finished analysis copying images to server folder" << endl;
+			ofFile md5(currentAdvert.getMD5File().path(),ofFile::WriteOnly);
+			md5 << currentAdvert.generateMD5();
+			md5.close();
+
+			currentAdvert.getMD5File().moveTo("www/"+currentAdvert.getMD5File().getFileName());
 			currentAdvert.getModel().moveTo("www/"+currentAdvert.getModel().getFileName());
+			currentAdvert.getLocationFile().moveTo("www/"+currentAdvert.getLocationFile().getFileName());
 			currentAdvert.getCompressedImage().copyTo("www/"+currentAdvert.getCompressedImage().getFileName());
 			currentAdvert.getROIFile().moveTo("www/"+currentAdvert.getROIFile().getFileName());
 			currentAdvert.getDetectorData().moveTo("www/"+currentAdvert.getDetectorData().getFileName());
