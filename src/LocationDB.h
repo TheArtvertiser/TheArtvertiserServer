@@ -8,7 +8,6 @@
 #ifndef LOCATIONDB_H_
 #define LOCATIONDB_H_
 
-#include "ofxAndroidGPS.h"
 #include "ofxGeoLocation.h"
 #include "ofConstants.h"
 #include "Artvert.h"

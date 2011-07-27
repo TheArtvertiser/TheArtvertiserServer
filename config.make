@@ -38,3 +38,5 @@ ANDROID_COMPILER_OPTIMIZATION = -Os
 # you can only set 1 path here
 
 USER_SOURCE_DIR = ../artvertiserCommon
+
+EXCLUDE_FROM_SOURCE="bin,.xcodeproj,obj,src/ofxHttpServer/example,.git"

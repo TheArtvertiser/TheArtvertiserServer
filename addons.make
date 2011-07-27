@@ -1,2 +1,3 @@
 ofxOpenCv
 ofxXmlSettings
+ofxThreadedImageLoader

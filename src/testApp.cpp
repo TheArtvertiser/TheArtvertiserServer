@@ -28,6 +28,13 @@ void testApp::setup(){
 		if(!artverts[i].checkIntegrity()){
 			ofLogError("artvertiserServer") << "found corrupt or incomplete advert " << artverts[i].getUID() << " deleting";
 			artverts[i].remove();
+		}else{
+			ofFile icon("www/"+artverts[i].getUID()+".icon.jpg");
+			if(!icon.exists()){
+				ofImage iconImg(artverts[i].getCompressedImage());
+				iconImg.resize(160,120);
+				iconImg.saveImage("www/"+artverts[i].getUID()+".icon.jpg");
+			}
 		}
 	}
 	server = ofxHTTPServer::getServer(); // get the instance of the server
@@ -246,10 +253,16 @@ void testApp::update(){
 	if(detector.getState()==Detector::Finished){
 		locationDB.addLocation(currentAdvert);
 		if(!currentAdvert.hasAlias()){
+			currentAdvert.getMD5File().moveTo("www/"+currentAdvert.getMD5File().getFileName()+".notready");
+
 			ofLogError("artvertiserServer") << "finished analysis copying images to server folder" << endl;
 			ofFile md5(currentAdvert.getMD5File().path(),ofFile::WriteOnly);
 			md5 << currentAdvert.generateMD5();
 			md5.close();
+
+			ofImage iconImg(currentAdvert.getCompressedImage());
+			iconImg.resize(160,120);
+			iconImg.saveImage("www/"+currentAdvert.getUID()+".icon.jpg");
 
 			currentAdvert.getMD5File().moveTo("www/"+currentAdvert.getMD5File().getFileName());
 			currentAdvert.getModel().moveTo("www/"+currentAdvert.getModel().getFileName());
