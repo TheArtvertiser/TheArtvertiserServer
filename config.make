@@ -11,7 +11,7 @@ OF_ROOT = ../../..
 # USER_CFLAGS = -I src/objects
 
 USER_CFLAGS = -Isrc -Isrc/ofxHttpServer/src -Isrc/ofxHttpServer/libs/microhttpd/include 
-USER_CFLAGS += -I../artvertiserCommon/gui -I../artvertiserCommon -I../artvertiserCommon/ferns_demo-1.1 -I../artvertiserCommon/FAST -I../artvertiserCommon/persistance -I../artvertiserCommon/cv -I../artvertiserCommon/ofxGeoLocation -I../artvertiserCommon/ofxMD5 -I../artvertiserCommon/ofxMD5/libs/md5-1.3.0
+USER_CFLAGS += -I../TheArtvertiserCommon/gui -I../TheArtvertiserCommon -I../TheArtvertiserCommon/ferns_demo-1.1 -I../TheArtvertiserCommon/FAST -I../TheArtvertiserCommon/persistance -I../TheArtvertiserCommon/cv -I../TheArtvertiserCommon/ofxGeoLocation -I../TheArtvertiserCommon/ofxMD5 -I../TheArtvertiserCommon/ofxMD5/libs/md5-1.3.0
 
 # USER_LDFLAGS allows to pass custom flags to the linker
 # for example libraries like:
@@ -37,6 +37,6 @@ ANDROID_COMPILER_OPTIMIZATION = -Os
 # useful if you need to share a folder with code between 2 apps. The makefile will search recursively
 # you can only set 1 path here
 
-USER_SOURCE_DIR = ../artvertiserCommon
+USER_SOURCE_DIR = ../TheArtvertiserCommon
 
 EXCLUDE_FROM_SOURCE="bin,.xcodeproj,obj,src/ofxHttpServer/example,.git"
