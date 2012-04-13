@@ -59,7 +59,10 @@ vector<string> LocationDB::listCountries(){
 	set<string> countries;
 	int numLocations = xml.getNumTags("location");
 	for(int i=0;i<numLocations;i++){
-		countries.insert(xml.getAttribute("location","country","",i));
+		string country = xml.getAttribute("location","country","",i);
+		if ( country == "" )
+			country = "unknown country";
+		countries.insert(country);
 	}
 	vector<string> countries_vec;
 	countries_vec.assign(countries.begin(),countries.end());
@@ -70,8 +73,13 @@ vector<string> LocationDB::listCities(string country){
 	set<string> cities;
 	int numLocations = xml.getNumTags("location");
 	for(int i=0;i<numLocations;i++){
-		if(country=="" || xml.getAttribute("location","country","",i)==country)
-			cities.insert(xml.getAttribute("location","city","",i));
+		if(country=="" || country=="unknown country" || xml.getAttribute("location","country","",i)==country)
+		{
+			string city = xml.getAttribute("location","city","",i);
+			if ( city == "" )
+				city = "unknown city";
+			cities.insert(city);
+		}
 	}
 	vector<string> cities_vec;
 	cities_vec.assign(cities.begin(),cities.end());
@@ -82,9 +90,14 @@ vector<string> LocationDB::listRoads(string country, string city){
 	set<string> roads;
 	int numLocations = xml.getNumTags("location");
 	for(int i=0;i<numLocations;i++){
-		if((country=="" || xml.getAttribute("location","country","",i)==country)
-			&& (city=="" || xml.getAttribute("location","city","",i)==city))
-			roads.insert(xml.getAttribute("location","road","",i));
+		if((country=="" || country=="unknown country" || xml.getAttribute("location","country","",i)==country)
+			&& (city=="" || city=="unknown city" || xml.getAttribute("location","city","",i)==city))
+		{
+			string road = xml.getAttribute("location","road","",i);
+			if ( road == "" )
+				road = "unknown road";
+			roads.insert(road);
+		}
 	}
 	vector<string> roads_vec;
 	roads_vec.assign(roads.begin(),roads.end());
@@ -95,9 +108,9 @@ vector<string> LocationDB::listArtverts(string country, string city, string road
 	set<string> uids;
 	int numLocations = xml.getNumTags("location");
 	for(int i=0;i<numLocations;i++){
-		if((country=="" || xml.getAttribute("location","country","",i)==country)
-				&& (city=="" || xml.getAttribute("location","city","",i)==city)
-				&& (road=="" || xml.getAttribute("location","road","",i)==road))
+		if((country=="" || country=="unknown country" || xml.getAttribute("location","country","unknown country",i)==country)
+				&& (city=="" || city=="unknown city" || xml.getAttribute("location","city","unknown city",i)==city)
+				&& (road=="" || road=="unknown road" ||  xml.getAttribute("location","road","unknown road",i)==road))
 			uids.insert(xml.getAttribute("location","uid","",i));
 	}
 	vector<string> uids_vec;
