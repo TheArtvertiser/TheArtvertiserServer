@@ -6,6 +6,7 @@
 		<project>addons</project>
 		<project>libs</project>
 		<project>openFrameworks</project>
+		<project>TheArtvertiserCommon</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -84,6 +85,16 @@
 			<name>artvertiserCommon</name>
 			<type>2</type>
 			<location>/home/arturo/Escritorio/openFrameworks/apps/artvertiser/artvertiserCommon</location>
+		</link>
+		<link>
+			<name>ofxHttpServer</name>
+			<type>2</type>
+			<location>/home/arturo/Desktop/openFrameworks/addons/ofxHttpServer</location>
+		</link>
+		<link>
+			<name>ofxHttpUtils</name>
+			<type>2</type>
+			<location>/home/arturo/Desktop/openFrameworks/addons/ofxHttpUtils</location>
 		</link>
 		<link>
 			<name>ofxOpenCv</name>
