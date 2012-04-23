@@ -232,7 +232,12 @@ void testApp::analizeNext(){
 		}
 
 		ofLogVerbose("artvertiserServer","ArtvertiserServer: got new artvert: " + currentAdvert.getUID());
+        ofLogVerbose("artvertiserServer","loading " + currentAdvert.getCompressedImage().getAbsolutePath() );
+        //currentImg.clear();
 		currentImg.loadImage(currentAdvert.getCompressedImage());
+        //currentImg.loadImage("/Users/damian/Desktop/test.jpg");
+        //currentImg.loadImage("/Users/damian/code/ofgit/apps/artvertiser/TheArtvertiserServer/bin/data/uploads/20111119_144037535.jpg");
+        //currentImg.loadImage(currentAdvert.getCompressedImage().getAbsolutePath());
 
 		ofImage bmp;
 		bmp.setUseTexture(false);
