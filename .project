@@ -6,7 +6,6 @@
 		<project>addons</project>
 		<project>libs</project>
 		<project>openFrameworks</project>
-		<project>TheArtvertiserCommon</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -81,6 +80,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
 	<linkedResources>
+		<link>
+			<name>TheArtvertiserCommon</name>
+			<type>2</type>
+			<location>/home/arturo/Desktop/openFrameworks/apps/artvertiser/TheArtvertiserCommon</location>
+		</link>
 		<link>
 			<name>artvertiserCommon</name>
 			<type>2</type>

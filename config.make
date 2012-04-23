@@ -11,7 +11,7 @@ OF_ROOT = ../../..
 # USER_CFLAGS = -I src/objects
 
 USER_CFLAGS = -Isrc 
-USER_CFLAGS += $(addprefix -I, $(shell find ../TheArtvertiserCommon -type d)) -I../TheArtvertiserCommon
+USER_CFLAGS += $(addprefix -I, $(shell find ../TheArtvertiserCommon \( -name .git -prune -o -type d \) -and \( -not -name .git \) )) -I../TheArtvertiserCommon
 
 # USER_LDFLAGS allows to pass custom flags to the linker
 # for example libraries like:
@@ -39,4 +39,4 @@ ANDROID_COMPILER_OPTIMIZATION = -Os
 
 USER_SOURCE_DIR = ../TheArtvertiserCommon
 
-EXCLUDE_FROM_SOURCE="bin,.xcodeproj,obj,src/ofxHttpServer/example,.git"
+EXCLUDE_FROM_SOURCE="bin,.xcodeproj,obj,src/ofxHttpServer/example,.git,../TheArtvertiserCommon/.git"
